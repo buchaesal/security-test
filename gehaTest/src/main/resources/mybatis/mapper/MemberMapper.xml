@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ge.ha.mapper.MemberMapper">
+<insert id="insertUser">
+INSERT INTO MEMBER (id, password, memberName, sex, authorityCode) VALUES(
+#{member.id},#{member.password},#{member.memberName},
+#{member.sex},#{member.authorityCode})
+</insert>
+<!-- <insert id="insertUserAutority">
+INSERT INTO AUTHORITY VALUES(#{authorityCode},#{authority})
+</insert> -->
+
+<select id="findById" resultType="com.ge.ha.domain.Member">
+select * from member where id = #{id}
+</select>
+</mapper>

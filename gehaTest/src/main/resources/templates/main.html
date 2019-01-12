@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>메인</h1>
+
+	<h1 th:if="${#httpServletRequest.remoteUser}"
+		th:text="${#httpServletRequest.remoteUser}+'님 안녕하세요'"></h1>
+
+	<div th:if="${#httpServletRequest.remoteUser}">
+		<form th:action="@{/logout}" method="post">
+			<input type="submit" value="Sign Out" />
+		</form>
+	</div>
+	<div th:unless="${#httpServletRequest.remoteUser}">
+		<a th:href="@{/login}">로그인</a>
+	</div>
+</body>
+</html>
