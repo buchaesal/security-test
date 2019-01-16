@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 			.antMatchers("/hello")
-			.hasRole("U")
+			.hasRole("USER")
 			.antMatchers("/**").permitAll()
 			.and()
 			.addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class)
@@ -72,16 +72,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	private Filter ssoFilter() {
+		
 		  OAuth2ClientAuthenticationProcessingFilter facebookFilter
 		  = new OAuth2ClientAuthenticationProcessingFilter("/login/facebook");
+		  
 		  OAuth2RestTemplate facebookTemplate 
 		  = new OAuth2RestTemplate(facebook(), oauth2ClientContext);
+		  
 		  facebookFilter.setRestTemplate(facebookTemplate);
+		  
 		  UserInfoTokenServices tokenServices 
 		  = new UserInfoTokenServices(facebookResource().getUserInfoUri(), 
 				  facebook().getClientId());
+		  
 		  tokenServices.setRestTemplate(facebookTemplate);
+		  
 		  facebookFilter.setTokenServices(tokenServices);
+		  
 		  return facebookFilter;
 		}
 	
@@ -99,7 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	public FilterRegistrationBean oauth2ClientFilterRegistration(
-	    OAuth2ClientContextFilter filter) {
+			OAuth2ClientContextFilter filter) {
 	  FilterRegistrationBean registration = new FilterRegistrationBean();
 	  registration.setFilter(filter);
 	  registration.setOrder(-100);
