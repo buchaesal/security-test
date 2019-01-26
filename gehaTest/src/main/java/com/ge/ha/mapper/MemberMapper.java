@@ -12,4 +12,10 @@ public interface MemberMapper {
 	
 	public Member findById(String id);
 	//public void insertUserAutority(String authorityCode, String authority);
+	
+	public int idCheck(String id);
+	
+	public void createAuthKey(String user_email, String user_authCode);
+	
+	public void userAuth(String id);
 }

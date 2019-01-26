@@ -10,8 +10,9 @@ import com.ge.ha.domain.Member;
 import com.ge.ha.mapper.MemberMapper;
 import com.ge.ha.security.SecurityMember;
 
+//데이터베이스에서 등록된 사용자로 로그인되도록 설정하는 클래스
 @Service
-public class LoginService implements UserDetailsService {
+public class UserDetailService implements UserDetailsService {
 
 	@Autowired
 	MemberMapper memberMapper;

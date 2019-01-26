@@ -3,15 +3,29 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ge.ha.mapper.MemberMapper">
 <insert id="insertUser">
-INSERT INTO MEMBER (id, password, memberName, sex, authorityCode) VALUES(
+INSERT INTO member_tb (id, password, memberName, gender, authority) VALUES(
 #{member.id},#{member.password},#{member.memberName},
-#{member.sex},#{member.authorityCode})
+#{member.gender},#{member.authority})
 </insert>
 <!-- <insert id="insertUserAutority">
 INSERT INTO AUTHORITY VALUES(#{authorityCode},#{authority})
 </insert> -->
 
 <select id="findById" resultType="com.ge.ha.domain.Member">
-select * from member where id = #{id}
+select * from member_tb where id = #{id}
 </select>
+
+<select id="idCheck" resultType="Integer">
+      SELECT COUNT(*) FROM member_tb
+      WHERE id = #{id}
+</select>
+
+<update id="createAuthKey">
+update member_tb set authCode = #{user_authCode} where id = #{user_email}
+</update>
+
+<update id="userAuth">
+update member_tb set status = 'OK' where id = #{id}
+</update>
+
 </mapper>

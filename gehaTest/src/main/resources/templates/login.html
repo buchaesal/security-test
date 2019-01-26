@@ -3,86 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script>
-
-var checkLoginStatus=function(response) {
-    console.log(response);
-  	//statusChangeCallback(response);
-  	
-  	if(response.status==='connected'){
-  		document.querySelector('#authBtn').value='Logout';
-  		FB.api('/me',function(resp){
-  			document.querySelector('#name').innerHTML='Welcome, '+resp.name;
-  			});
-  	}else{
-  		document.querySelector('#authBtn').value='Login';
-  		document.querySelector('#name').innerHTML='';
-  	}
-  }
-
-window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '557317808074123',
-      cookie     : true,  // enable cookies to allow the server to access 
-                          // the session
-      xfbml      : true,  // parse social plugins on this page
-      version    : 'v3.2' // use graph api version 2.8
-    });
-
-    // Now that we've initialized the JavaScript SDK, we call 
-    // FB.getLoginStatus().  This function gets the state of the
-    // person visiting this page and can return one of three states to
-    // the callback you provide.  They can be:
-    //
-    // 1. Logged into your app ('connected')
-    // 2. Logged into Facebook, but not your app ('not_authorized')
-    // 3. Not logged into Facebook and can't tell if they are logged into
-    //    your app or not.
-    //
-    // These three cases are handled in the callback function.
-
-    
-    FB.getLoginStatus(checkLoginStatus);
-
-  };
-//Load the SDK asynchronously
-(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "https://connect.facebook.net/en_US/sdk.js";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
-</script>
 </head>
 <body>
-<h1>로그인</h1>
+	<h1>로그인화면</h1>
 
-<input type="button" id="authBtn" value="checking..." onclick="
-if(this.value==='Login'){
-	//now logout
-	FB.login(function(res){
-		console.log('login=>',res);
-		checkLoginStatus(res);
-	});
-}else{
-	//now login
-FB.logout(function(res){
-	console.log('logout=>',res);
-	checkLoginStatus(res);
-	});
-}
-"><span id="name"></span>
 
+
+	<a class="facebook-login-text" href="/login/facebook">
+	<img src="https://www.yagaja.com/resources/images/newMobileWeb/common/pop_facebook.png"
+	width="200" height="40"></a>
+	<a href="/login/google">구글로그인</a>
 	<div th:if="${param.error}">아이디 혹은 패스워드가 올바르지 않습니다.</div>
-	<a class="facebook-login-text" href="/login/facebook">facebook으로 로그인</a>
-<form th:action="@{/login}" method="post">
-아이디:<input type="text" name="id">
-비밀번호:<input type="password" name="password">
-<input type="submit" value="로그인">
-</form>
-<a th:href="@{/signup}">회원가입</a>
-<a th:href="@{/goFindPw}">비밀번호 찾기</a>
+	<form th:action="@{/login}" method="post">
+		아이디:<input type="text" name="id"><br/>
+		비밀번호:<input type="password" name="password"><br/>
+				<input type="submit" value="로그인"><br/>
+	</form>
+	<a th:href="@{/signup}">회원가입</a>
+	<a th:href="@{/goFindPw}">비밀번호 찾기</a>
 </body>
 </html>

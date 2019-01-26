@@ -1,17 +1,24 @@
 package com.ge.ha.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ge.ha.domain.Member;
+import com.ge.ha.security.SecurityMember;
 import com.ge.ha.service.EmailServiceImpl;
 import com.ge.ha.service.MemberService;
 
@@ -24,20 +31,28 @@ public class MemberController {
 	@Autowired
 	EmailServiceImpl emailService;
 
-	@RequestMapping("/")
-	public String auth(Model model) {
-		/*
-		 * if(authentication!=null) { LinkedHashMap<String, Object> properties =
-		 * (LinkedHashMap<String, Object>) authentication
-		 * .getUserAuthentication().getDetails();
-		 * 
-		 * model.addAttribute("email",properties.get("email")); }
-		 */
-		return "/main";
-	}
 
-	@RequestMapping("/findPw")
+	
+	@PostMapping(value="/idcheck.do")
+    @ResponseBody
+    public Map<Object, Object> idcheck(@RequestBody String id) {
+        
+        int count = 0;
+        Map<Object, Object> map = new HashMap<Object, Object>();
+ 
+        count = service.idCheck(id);
+        map.put("cnt", count);
+ 
+        return map;
+    }
+	
+	@RequestMapping("/login")
+	public void login() {
+		
+	}
+	@RequestMapping("/goFindPw")
 	public String goFindPw() {
+		
 		return "/findPw";
 	}
 
@@ -74,10 +89,25 @@ public class MemberController {
 	}
 
 
+
 	@RequestMapping("/signup")
 	public String signup() {
 
 		return "/signup";
+	}
+	
+	@RequestMapping("/facebook/complete")
+	public String facebookComplete() {
+		OAuth2Authentication authentication = (OAuth2Authentication) SecurityContextHolder
+				.getContext()
+				.getAuthentication();
+		
+		Map<String, String> map = (HashMap<String, String>)authentication
+				.getUserAuthentication().getDetails();
+		
+		System.out.println(map.get("gender"));
+		
+		return "/fbComplete";
 	}
 	
 	@RequestMapping("/modifyPw")
@@ -86,26 +116,39 @@ public class MemberController {
 		return "/modifyPw";
 	}
 
-	@RequestMapping("/login")
-	public String login() {
 
-		return "/login";
-	}
 
 	@RequestMapping("/hello")
-	public String hello() {
-
+	public String hello(Authentication auth) {
+		SecurityMember sc = (SecurityMember)auth.getPrincipal();
+		System.out.println(sc.getMemberCode());
 		return "/hello";
 	}
 
 	@PostMapping("/create")
-	public String create(Member member) {
+	public String create(Member member,RedirectAttributes rttr) throws Exception {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		member.setPassword(passwordEncoder.encode(member.getPassword()));
-		member.setAuthorityCode("USER");
+		member.setAuthority("USER");
 		service.save(member);
 		return "redirect:/";
 
+	}
+	
+	
+	@RequestMapping(value = "/emailConfirming", method = RequestMethod.GET)
+	public String emailConfirming(String id,String key,Model model) 
+			throws Exception { // 이메일인증
+		service.userAuth(id);
+		model.addAttribute("user_email", id);
+		
+
+		return "/emailConfirm";
+	}
+	
+	@RequestMapping("/emailConfirm")
+	public void emailConfirm() {
+	
 	}
 
 }

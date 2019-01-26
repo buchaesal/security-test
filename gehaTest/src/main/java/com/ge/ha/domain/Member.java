@@ -5,9 +5,11 @@ public class Member {
 	private String id;
 	private String password;
 	private String memberName;
-	private String sex;
-	private String authorityCode;
+	private String gender;
+	private String authority;
 	private String businessLicense;
+	private String authCode;
+	private String status;
 	
 	
 
@@ -43,21 +45,7 @@ public class Member {
 		this.memberName = memberName;
 	}
 
-	public String getSex() {
-		return sex;
-	}
 
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-
-	public String getAuthorityCode() {
-		return authorityCode;
-	}
-
-	public void setAuthorityCode(String authorityCode) {
-		this.authorityCode = authorityCode;
-	}
 
 	public String getBusinessLicense() {
 		return businessLicense;
@@ -67,11 +55,45 @@ public class Member {
 		this.businessLicense = businessLicense;
 	}
 
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getAuthority() {
+		return authority;
+	}
+
+	public void setAuthority(String authority) {
+		this.authority = authority;
+	}
+
+	public String getAuthCode() {
+		return authCode;
+	}
+
+	public void setAuthCode(String authCode) {
+		this.authCode = authCode;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "Member [memberCode=" + memberCode + ", id=" + id + ", password=" + password + ", memberName="
-				+ memberName + ", sex=" + sex + ", authorityCode=" + authorityCode + ", businessLicense="
-				+ businessLicense + "]";
+				+ memberName + ", gender=" + gender + ", authority=" + authority + ", businessLicense="
+				+ businessLicense + ", authCode=" + authCode + ", status=" + status + "]";
 	}
+
+
 
 }

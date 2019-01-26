@@ -5,10 +5,10 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h1>메인</h1>
-
-	<h1 th:if="${#httpServletRequest.remoteUser}"
-		th:text="${#httpServletRequest.remoteUser}+'님 안녕하세요'"></h1>
+	<h1>#GEHA메인</h1>
+	
+ 	<h1 th:if="${#httpServletRequest.remoteUser}"
+		th:text="${name}+'님 안녕하세요'"></h1>
 
 	<div th:if="${#httpServletRequest.remoteUser}">
 		<form th:action="@{/logout}" method="post">
@@ -17,7 +17,8 @@
 	</div>
 	<div th:unless="${#httpServletRequest.remoteUser}">
 		<a th:href="@{/login}">로그인</a>
-	</div>
+		<p th:text="${name}"></p>
+	</div> 
 	
 		
 

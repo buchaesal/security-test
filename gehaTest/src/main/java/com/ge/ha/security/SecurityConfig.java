@@ -1,5 +1,8 @@
 package com.ge.ha.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.Filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +25,9 @@ import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilt
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.CompositeFilter;
 
-import com.ge.ha.service.LoginService;
+import com.ge.ha.service.UserDetailService;
 
 
 @EnableWebSecurity
@@ -31,7 +35,7 @@ import com.ge.ha.service.LoginService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	LoginService loginService;
+	UserDetailService userDetailService;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -48,14 +52,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 			.antMatchers("/hello")
-			.hasRole("USER")
+			.authenticated()
+			.antMatchers("/login").anonymous()
 			.antMatchers("/**").permitAll()
-			.and()
+			.and().exceptionHandling().accessDeniedPage("/").and()
 			.addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class)
 		.formLogin()
 			.loginPage("/login")
 			.usernameParameter("id")
-			.defaultSuccessUrl("/hello")
+			.defaultSuccessUrl("/")
 			.and()
 		.logout()
 			.logoutSuccessUrl("/").permitAll();
@@ -63,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.eraseCredentials(false).userDetailsService(loginService).passwordEncoder(passwordEncoder);
+		auth.eraseCredentials(false).userDetailsService(userDetailService).passwordEncoder(passwordEncoder);
 	}
 
 	@Bean
@@ -71,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 	
-	private Filter ssoFilter() {
+	/*private Filter ssoFilter() {
 		
 		  OAuth2ClientAuthenticationProcessingFilter facebookFilter
 		  = new OAuth2ClientAuthenticationProcessingFilter("/login/facebook");
@@ -89,10 +94,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		  
 		  facebookFilter.setTokenServices(tokenServices);
 		  
+		  facebookFilter.setAuthenticationSuccessHandler((request,response,authentication)
+				  ->response.sendRedirect("/facebook/complete"));
+		  
 		  return facebookFilter;
-		}
+		}*/
 	
-	@Bean
+	/*@Bean
 	@ConfigurationProperties("facebook.client")
 	public AuthorizationCodeResourceDetails facebook() {
 	return new AuthorizationCodeResourceDetails();
@@ -102,7 +110,47 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@ConfigurationProperties("facebook.resource")
 	public ResourceServerProperties facebookResource() {
 	return new ResourceServerProperties();
-	}
+	}*/
+	
+	 private Filter ssoFilter() {
+	        CompositeFilter filter = new CompositeFilter();
+	        List<Filter> filters = new ArrayList<>();
+	        filters.add(ssoFilter(google(), "/login/google")); //  이전에 등록했던 OAuth 리다이렉트 URL 
+	        filters.add(ssoFilter(facebook(), "/login/facebook"));
+	        filter.setFilters(filters);
+	        return filter;
+	    }
+	 
+	    private Filter ssoFilter(ClientResources client, String path) {
+	        OAuth2ClientAuthenticationProcessingFilter filter = 
+	        		new OAuth2ClientAuthenticationProcessingFilter(path);
+	        
+	        OAuth2RestTemplate restTemplate = 
+	        		new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
+	        
+	        filter.setRestTemplate(restTemplate);
+	        
+	        UserInfoTokenServices tokenServices = 
+	        		new UserInfoTokenServices(client.getResource().getUserInfoUri(), client.getClient().getClientId());
+	        
+	        tokenServices.setRestTemplate(restTemplate);
+	        
+	        filter.setTokenServices(tokenServices);
+	        
+	        return filter;
+	    }
+	    
+		@Bean
+	    @ConfigurationProperties("facebook")
+	    public ClientResources facebook() {
+	        return new ClientResources();
+	    }
+		
+	    @Bean
+	    @ConfigurationProperties("google")
+	    public ClientResources google() {
+	        return new ClientResources();
+	    }
 	
 	@Bean
 	public FilterRegistrationBean oauth2ClientFilterRegistration(
