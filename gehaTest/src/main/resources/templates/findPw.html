@@ -79,7 +79,7 @@
 		<p>이메일에 인증코드가 전송되었습니다. 입력해주세요.</p>
 		<p id="error"></p>
 		
-		<form action="/checkMail" id="checkMail">
+		<form action="/modifyPw" id="checkMail">
 			<input type="hidden" id="text" th:value="${text}" name="text">
 			<input type="text" id="input" name="input"> 
 			<input type="button" value="확인" onclick="checkMail()">

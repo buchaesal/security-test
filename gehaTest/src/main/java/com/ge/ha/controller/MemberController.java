@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ge.ha.domain.Member;
+import com.ge.ha.mapper.MemberMapper;
 import com.ge.ha.security.SecurityMember;
 import com.ge.ha.service.EmailServiceImpl;
 import com.ge.ha.service.MemberService;
@@ -30,6 +31,9 @@ public class MemberController {
 
 	@Autowired
 	EmailServiceImpl emailService;
+	
+	@Autowired
+	MemberMapper memberMapper;
 
 
 	
@@ -83,17 +87,12 @@ public class MemberController {
 	
 	
 	
-	@RequestMapping("/checkMail")
-	public String checkMail() {
-		return "/modifyPw";
-	}
+
 
 
 
 	@RequestMapping("/signup")
-	public String signup() {
-
-		return "/signup";
+	public void signup() {
 	}
 	
 	@RequestMapping("/facebook/complete")
@@ -111,9 +110,8 @@ public class MemberController {
 	}
 	
 	@RequestMapping("/modifyPw")
-	public String modifyPw() {
+	public void modifyPw() {
 
-		return "/modifyPw";
 	}
 
 
@@ -126,12 +124,12 @@ public class MemberController {
 	}
 
 	@PostMapping("/create")
-	public String create(Member member,RedirectAttributes rttr) throws Exception {
+	public String create(Member member) throws Exception {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		member.setPassword(passwordEncoder.encode(member.getPassword()));
 		member.setAuthority("USER");
 		service.save(member);
-		return "redirect:/";
+		return "/sendEmailComplete";
 
 	}
 	
@@ -139,16 +137,29 @@ public class MemberController {
 	@RequestMapping(value = "/emailConfirming", method = RequestMethod.GET)
 	public String emailConfirming(String id,String key,Model model) 
 			throws Exception { // 이메일인증
-		service.userAuth(id);
-		model.addAttribute("user_email", id);
 		
-
+		Member member= memberMapper.findById(id);
+		if(key.equals(member.getAuthCode())) {
+			service.userAuth(id);
+			model.addAttribute("name", member.getMemberName());
+		}else {
+			model.addAttribute("error", "인증에 실패했습니다. 다시 시도해주세요.");
+		}
+		
 		return "/emailConfirm";
 	}
 	
 	@RequestMapping("/emailConfirm")
 	public void emailConfirm() {
 	
+	}
+	@RequestMapping("/chooseAuth")
+	public void chooseAuth() {
+		
+	}
+	@RequestMapping("/sendEmailComplete")
+	public void sendEmailComplete() {
+		
 	}
 
 }

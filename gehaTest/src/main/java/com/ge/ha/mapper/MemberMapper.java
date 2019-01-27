@@ -15,7 +15,7 @@ public interface MemberMapper {
 	
 	public int idCheck(String id);
 	
-	public void createAuthKey(String user_email, String user_authCode);
+	public void createAuthKey(String id, String authCode);
 	
 	public void userAuth(String id);
 }

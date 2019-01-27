@@ -21,11 +21,11 @@ select * from member_tb where id = #{id}
 </select>
 
 <update id="createAuthKey">
-update member_tb set authCode = #{user_authCode} where id = #{user_email}
+update member_tb set authCode = #{authCode} where id = #{id}
 </update>
 
 <update id="userAuth">
-update member_tb set status = 'OK' where id = #{id}
+update member_tb set authStatus = 'Y' where id = #{id}
 </update>
 
 </mapper>

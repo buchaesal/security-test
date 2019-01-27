@@ -21,7 +21,7 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Transactional
 	public void save(Member member) throws Exception {
-		memberMapper.insertUser(member);
+		memberMapper.insertUser(member); //정보 데이터에 넣기
 		//memberMapper.insertUserAutority(member.getAuthorityCode(), authority);
 		
 		String key = new TempKey().getKey(50, false); // 인증키 생성
@@ -29,21 +29,17 @@ public class MemberServiceImpl implements MemberService {
 		memberMapper.createAuthKey(member.getId(), key); // 인증키 DB저장
 
 		MailHandler sendMail = new MailHandler(mailSender);
-		sendMail.setSubject("[#GEHA 서비스 이메일 인증]");
+		sendMail.setSubject("[#GEHA 회원가입 이메일 인증]");
 		sendMail.setText(
-				new StringBuffer().append("<h1>메일인증</h1>")
-				.append("<a href='http://localhost:8888/emailConfirm?id=")
+				new StringBuffer()
+				.append("<h1>회원가입 인증 메일입니다.</h1><h3>아래의 버튼을 눌러 회원가입을 완료해주세요.</h3>")
+				.append("<a href='http://localhost:8888/emailConfirming?id=")
 				.append(member.getId()).append("&key=").append(key)
-				.append("' target='_blenk'>이메일 인증 확인</a>").toString());
+				.append("' target='_blank'>회원가입 인증 확인</a>").toString());
 		sendMail.setFrom("eks4116@gmail.com", "샵게하 운영자");
 		sendMail.setTo(member.getId());
 		sendMail.send();
 		
-		/*emailService.sendSimpleMessage(member.getId(), "[GEHA 회원가입 이메일 인증]", 
-				new StringBuffer().append("<h1>메일인증</h1>")
-				.append("<a href='http://localhost:8888/user/emailConfirm?id=")
-				.append(member.getId()).append("&key=").append(key)
-				.append("' target='_blank'>이메일 인증 확인</a>").toString());*/
 	}
 
 	@Override
